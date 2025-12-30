@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Build Test
 
 on:
   push:
@@ -7,12 +7,18 @@ on:
     branches: [ "main" ]
 
 jobs:
-
-  build:
-
+  test-build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          # Ini mensimulasikan perintah docker build yang biasa Anda ketik di terminal
+          docker build -t my-test-image:latest .
+          
+      - name: Verify Docker Image
+        run: |
+          # Memastikan image berhasil dibuat dan ada di daftar
+          docker images
