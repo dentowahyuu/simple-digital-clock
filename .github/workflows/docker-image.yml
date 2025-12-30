@@ -1,24 +1,31 @@
-name: Docker Build Test
+name: Build and Store Image
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  test-build:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write  # Penting untuk izin simpan image
+
     steps:
       - name: Checkout kode
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: |
-          # Ini mensimulasikan perintah docker build yang biasa Anda ketik di terminal
-          docker build -t my-test-image:latest .
-          
-      - name: Verify Docker Image
-        run: |
-          # Memastikan image berhasil dibuat dan ada di daftar
-          docker images
+      - name: Login ke GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Nama image akan mengikuti username/repo Anda
+          tags: ghcr.io/${{ github.repository }}:latest
