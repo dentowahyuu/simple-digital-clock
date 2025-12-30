@@ -1,31 +1,33 @@
-name: Build and Store Image
+name: Deploy Parking Project
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write  # Penting untuk izin simpan image
-
     steps:
       - name: Checkout kode
         uses: actions/checkout@v4
 
-      - name: Login ke GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Deploy ke Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Logika 'Clean Existing' dari Jenkins Anda
+            # Hapus container lama jika ada
+            docker stop parking || true
+            docker rm parking || true
+            docker rmi dentowahyu/parking:latest || true
 
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          # Nama image akan mengikuti username/repo Anda
-          tags: ghcr.io/${{ github.repository }}:latest
+            # Masuk ke folder project (Opsional jika build di server)
+            # Atau tarik image jika Anda build di GitHub
+            
+            # Rebuild dan Run (Logika Build Docker Anda)
+            cd /path/to/your/project
+            docker build -t dentowahyu/jam:latest .
+            docker run -d -p 8070:80 --name jam dentowahyu/jam:latest
