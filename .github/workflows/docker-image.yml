@@ -1,24 +1,27 @@
-name: Docker Build Test
-
+name: Build and Publish image to Docker Hub
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - 'Dockerfile'
+      - 'index.html'
+      - 'style.css'
+      - 'script.js'
 
 jobs:
-  test-build:
+  publish_images:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout kode
+      - name: checkout
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u dentowahyuu --password-stdin
+
+      - name: Build and Push image
         run: |
-          # Ini mensimulasikan perintah docker build yang biasa Anda ketik di terminal
-          docker build -t my-test-image:latest .
-          
-      - name: Verify Docker Image
-        run: |
-          # Memastikan image berhasil dibuat dan ada di daftar
-          docker images
+          # Membangun image
+          docker build . -t dentowahyuu/jam-digital:latest
+          # Mengirim image
+          docker push dentowahyuu/jam-digital:latest
