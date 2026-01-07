@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  jam-app:
+    # Nama image yang diambil dari Docker Hub kamu
+    image: dentowahyuu/jam-digital:latest
+    
+    # Nama container saat dijalankan (bebas pilih nama)
+    container_name: jam-digital-container
+    
+    # Mapping Port (Port Laptop : Port Docker)
+    ports:
+      - "8082:80"
+    
+    # Kebijakan restart (otomatis nyala jika docker restart/laptop restart)
+    restart: always
